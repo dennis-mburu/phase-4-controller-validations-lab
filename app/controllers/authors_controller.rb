@@ -1,14 +1,13 @@
 class AuthorsController < ApplicationController
+  rescue_from ActiveRecord::RecordInvalid, with: :render_invalid_record_response
   
   def show
     author = Author.find(params[:id])
-
     render json: author
   end
 
   def create
-    author = Author.create(author_params)
-
+    author = Author.create!(author_params)
     render json: author, status: :created
   end
 
@@ -18,4 +17,7 @@ class AuthorsController < ApplicationController
     params.permit(:email, :name)
   end
   
+  def render_invalid_record_response(invalid)
+    render json: {errors: invalid.record.errors}, status: 422
+  end
 end
